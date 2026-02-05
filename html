@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Quick Question...</title>
+    <title>A Special Question</title>
     <style>
         body {
             margin: 0;
@@ -11,68 +11,66 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #ffe0e9;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden; /* Prevents scrollbars if the button moves near edges */
+            background-color: #ffafcc; /* Soft Pink */
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
         }
 
         #card {
             background: white;
-            padding: 3rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
             text-align: center;
-            z-index: 10;
+            width: 350px;
+            z-index: 1;
         }
 
         h1 {
-            color: #ff4d6d;
-            font-size: 2.5rem;
-            margin-bottom: 2rem;
+            color: #d00000;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
         }
 
-        .button-container {
+        .btn-wrap {
             display: flex;
             justify-content: center;
-            align-items: center;
             gap: 20px;
+            height: 50px; /* Keeps layout stable */
         }
 
         button {
-            padding: 15px 40px;
-            font-size: 1.2rem;
+            padding: 12px 30px;
+            font-size: 1rem;
             font-weight: bold;
             border: none;
-            border-radius: 50px;
+            border-radius: 12px;
             cursor: pointer;
-            transition: transform 0.2s;
         }
 
         #yesBtn {
             background-color: #ff4d6d;
             color: white;
-            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4);
-            animation: pulse 1.5s infinite;
+            transition: transform 0.2s;
+        }
+
+        #yesBtn:hover {
+            transform: scale(1.15);
         }
 
         #noBtn {
-            background-color: #adb5bd;
+            background-color: #6c757d;
             color: white;
-            position: absolute; /* Allows it to move anywhere */
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+            position: absolute; /* Vital for the "running away" logic */
+            transition: 0.1s ease; /* Makes it look like it's sliding away */
         }
 
         .hidden {
             display: none;
         }
 
-        #successMessage {
-            font-size: 3rem;
+        #celebration {
+            font-size: 1.5rem;
             color: #ff4d6d;
         }
     </style>
@@ -80,50 +78,50 @@
 <body>
 
     <div id="card">
-        <div id="questionContainer">
+        <div id="main-content">
             <h1>Will you be my Valentine? ❤️</h1>
-            <div class="button-container">
-                <button id="yesBtn" onclick="celebrate()">YES!</button>
-                <button id="noBtn">No</button>
+            <div class="btn-wrap">
+                <button id="yesBtn" onclick="showLove()">YES!</button>
+                <button id="noBtn" onmouseover="moveButton()">No</button>
             </div>
         </div>
-        
-        <div id="successMessage" class="hidden">
-            <h1>Yay! Best decision ever! 🥰✨</h1>
-            <p>Can't wait to see you!</p>
+
+        <div id="celebration" class="hidden">
+            <h1>Yay! I knew it! 🥰</h1>
+            <p>Prepare for the best Valentine's Day ever!</p>
         </div>
     </div>
 
     <script>
         const noBtn = document.getElementById('noBtn');
-        const questionContainer = document.getElementById('questionContainer');
-        const successMessage = document.getElementById('successMessage');
 
-        // Logic to make the No button run away
-        noBtn.addEventListener('mouseover', () => {
-            // Get window dimensions
-            const windowWidth = window.innerWidth;
-            const windowHeight = window.innerHeight;
+        // This function teleports the No button
+        function moveButton() {
+            // Calculate random positions
+            // Subtracting 100 to ensure it doesn't spawn partially off-screen
+            const x = Math.random() * (window.innerWidth - 100);
+            const y = Math.random() * (window.innerHeight - 50);
 
-            // Generate random coordinates
-            // We subtract button size to keep it within view
-            const newX = Math.random() * (windowWidth - noBtn.offsetWidth);
-            const newY = Math.random() * (windowHeight - noBtn.offsetHeight);
-
-            // Apply new position
-            noBtn.style.left = `${newX}px`;
-            noBtn.style.top = `${newY}px`;
-        });
-
-        // Logic for clicking Yes
-        function celebrate() {
-            questionContainer.classList.add('hidden');
-            successMessage.classList.remove('hidden');
-            noBtn.style.display = 'none'; // Hide the "No" button finally
-            
-            // Optional: Simple alert
-            // alert("I knew you'd say yes! ❤️");
+            noBtn.style.left = `${x}px`;
+            noBtn.style.top = `${y}px`;
         }
+
+        // This function handles the "Yes" click
+        function showLove() {
+            document.getElementById('main-content').classList.add('hidden');
+            document.getElementById('celebration').classList.remove('hidden');
+            noBtn.style.display = 'none'; // Make sure No is gone
+            
+            // Add a little extra flair
+            document.body.style.backgroundColor = "#ff4d6d";
+        }
+
+        // Set initial position of No button so it starts next to Yes
+        window.onload = () => {
+            const rect = noBtn.getBoundingClientRect();
+            noBtn.style.left = rect.left + 'px';
+            noBtn.style.top = rect.top + 'px';
+        };
     </script>
 </body>
 </html>
