@@ -2,127 +2,163 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Quick Question...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>For You ❤️</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
+        :root {
+            --primary: #ff4d6d;
+            --secondary: #ff85a1;
+            --bg: #fff0f3;
+        }
+
         body {
             margin: 0;
+            padding: 0;
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #ffe0e9;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden; /* Prevents scrollbars if the button moves near edges */
+            background-color: var(--bg);
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            touch-action: manipulation;
         }
 
-        #card {
-            background: white;
-            padding: 3rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        #container {
+            width: 85%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 40px 20px;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(255, 77, 109, 0.15);
             text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.5s ease;
+            position: relative;
             z-index: 10;
         }
 
         h1 {
-            color: #ff4d6d;
-            font-size: 2.5rem;
-            margin-bottom: 2rem;
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            line-height: 1.2;
         }
 
-        .button-container {
+        p {
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .btn-group {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
+            position: relative;
+            height: 140px;
         }
 
         button {
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            font-weight: bold;
+            padding: 16px 0;
+            width: 200px;
+            font-size: 1.1rem;
+            font-weight: 600;
             border: none;
-            border-radius: 50px;
+            border-radius: 15px;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.2s active;
+            -webkit-tap-highlight-color: transparent;
         }
 
         #yesBtn {
-            background-color: #ff4d6d;
+            background: var(--primary);
             color: white;
-            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4);
-            animation: pulse 1.5s infinite;
+            box-shadow: 0 10px 20px rgba(255, 77, 109, 0.3);
+            z-index: 2;
         }
 
         #noBtn {
-            background-color: #adb5bd;
-            color: white;
-            position: absolute; /* Allows it to move anywhere */
+            background: #eee;
+            color: #777;
+            position: absolute;
+            top: 80px;
+            z-index: 1;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        .hidden {
+        .meme-img {
+            width: 100%;
+            max-width: 250px;
+            border-radius: 15px;
+            margin-top: 20px;
             display: none;
+            animation: popIn 0.5s ease;
         }
 
-        #successMessage {
-            font-size: 3rem;
-            color: #ff4d6d;
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
+
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div id="card">
-        <div id="questionContainer">
-            <h1>Will you be my Valentine? ❤️</h1>
-            <div class="button-container">
+    <div id="container">
+        <div id="content">
+            <h1>Will you be my Valentine? 🌹</h1>
+            <p>I have a special day planned...</p>
+            
+            <div class="btn-group">
                 <button id="yesBtn" onclick="celebrate()">YES!</button>
-                <button id="noBtn">No</button>
+                <button id="noBtn" ontouchstart="moveButton(event)" onmouseover="moveButton(event)">No</button>
             </div>
         </div>
-        
-        <div id="successMessage" class="hidden">
-            <h1>Yay! Best decision ever! 🥰✨</h1>
-            <p>Can't wait to see you!</p>
+
+        <div id="success" class="hidden">
+            <h1>YAY! 🥰✨</h1>
+            <p>You made me the happiest person alive!</p>
+            <img src="https://media.tenor.com/9iS_as9EcD8AAAAM/cute-cat-love.gif" alt="Cute Cat Meme" class="meme-img" id="meme">
         </div>
     </div>
 
     <script>
         const noBtn = document.getElementById('noBtn');
-        const questionContainer = document.getElementById('questionContainer');
-        const successMessage = document.getElementById('successMessage');
+        const content = document.getElementById('content');
+        const success = document.getElementById('success');
+        const meme = document.getElementById('meme');
 
-        // Logic to make the No button run away
-        noBtn.addEventListener('mouseover', () => {
-            // Get window dimensions
-            const windowWidth = window.innerWidth;
-            const windowHeight = window.innerHeight;
-
-            // Generate random coordinates
-            // We subtract button size to keep it within view
-            const newX = Math.random() * (windowWidth - noBtn.offsetWidth);
-            const newY = Math.random() * (windowHeight - noBtn.offsetHeight);
-
-            // Apply new position
-            noBtn.style.left = `${newX}px`;
-            noBtn.style.top = `${newY}px`;
-        });
-
-        // Logic for clicking Yes
-        function celebrate() {
-            questionContainer.classList.add('hidden');
-            successMessage.classList.remove('hidden');
-            noBtn.style.display = 'none'; // Hide the "No" button finally
+        function moveButton(e) {
+            // Prevent default behavior to stop accidental clicks
+            e.preventDefault();
             
-            // Optional: Simple alert
-            // alert("I knew you'd say yes! ❤️");
+            // Calculate random positions within the visible viewport
+            // Leaving a 100px margin so it doesn't get stuck in corners
+            const x = Math.random() * (window.innerWidth - 200);
+            const y = Math.random() * (window.innerHeight - 100);
+
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = `${x}px`;
+            noBtn.style.top = `${y}px`;
+        }
+
+        function celebrate() {
+            // Confetti effect!
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#ff4d6d', '#ff85a1', '#ffb3c1']
+            });
+
+            content.classList.add('hidden');
+            success.classList.remove('hidden');
+            meme.style.display = 'inline-block';
+            noBtn.style.display = 'none';
         }
     </script>
 </body>
